@@ -1,0 +1,139 @@
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "pytest_cache",
+    ".idea",
+    ".githooks",
+    "__pycache__",
+    "docs",
+    "framework/templates",
+    "framework/generators/tests/integration/data/*",
+]
+
+indent-width = 4
+line-length = 120
+
+# minimum Python version that should be supported
+target-version = "py312"
+
+# For local use, CI overrides report with CLI option
+output-format = "concise"
+
+# Enumerate all fixed violations
+show-fixes = true
+
+# TBD might be necessary for monorepo: https://docs.astral.sh/ruff/settings/#src
+src = []
+
+namespace-packages = ["apps", "framework/dockerfiles/if-wsl/setup/scripts", "**/tests/**"]
+
+[lint]
+# enable all linting, conflicting rules are handled by ruff automatically
+select = ["ALL"]
+
+# exclude rules on a case by case basis
+ignore = [
+    # modules
+    "DJ",  # django
+    
+    # individual rules
+    "PLR0913", # Too many arguments to function call
+    "PD010", # `.pivot_table` is preferred to `.pivot` or `.unstack`; provides same functionality
+    "D100", # disable docstring in module
+    "D101", # disable docstring in class
+    "D102", # disable docstring in public class method
+    "D103", # disable docstring in public function
+    "D104", # disable docstring in package
+    "D105", # disable docstring in magic method
+    "D106", # disable docstring in public nested class
+    "D107", # disable docstring in init
+    "D203", # one-blank-line-before-class (in favor of incompatible `no-blank-line-before-class` (D211))
+    "D213", # multi-line-summary-second-line (in favor of incompatible `multi-line-summary-first-line` (D212))
+    "ANN401", # allow any type consistent with mypy settings
+
+    # disable linter rules that are covered by formatter see https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules    
+    "W191", # indentation
+    "E111", # indentation
+    "E114", # indentation
+    "E117", # indentation
+    "D206", # indentation
+    "D300", # quotes
+    "Q000", # quotes
+    "Q001", # quotes
+    "Q002", # quotes
+    "Q003", # quotes
+    "COM812", # trailing comma, setting in formatter
+    "COM819", # trailing comma, setting in formatter
+    "ISC001", # string concatenation
+    "ISC002", # string concatenation
+    
+    "G004", # Logging statement uses f-string
+
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# TBD might be needed later, probably need to overwrite in each app locally
+logger-objects = []
+
+# TBD adding specific typing modules to treat type object imports as types
+typing-modules = []
+
+# ignore user of assert errors in tests
+[lint.per-file-ignores]
+"**/tests/**/*.py" = ["S101"]
+
+[lint.flake8-annotations]
+# make it easier to transition from untyped code
+ignore-fully-untyped = true
+
+[lint.flake8-import-conventions.aliases]
+# Declare the default aliases.
+numpy = "np"
+pandas = "pd"
+scipy = "sp"
+
+[lint.flake8-type-checking]
+# Add quotes around type annotations, if doing so would allow
+# an import to be moved into a type-checking block.
+# this prevents unnecessary runtime imports
+quote-annotations = true
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+# see https://docs.astral.sh/ruff/formatter/#docstring-formatting for recognized formats
+docstring-code-format = true
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+docstring-code-line-length = "dynamic"

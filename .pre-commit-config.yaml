@@ -1,0 +1,18 @@
+repos:
+- repo: local
+  hooks:
+    - id: ruff-fix
+      name: Linting with Automatic Fixes
+      entry: ci/ruff.sh
+      args:
+        - check
+        - --fix
+      language: system
+      pass_filenames: false
+    - id: ruff-format
+      name: Formatting
+      entry: ci/ruff.sh
+      args:
+        - format
+      language: system
+      pass_filenames: false 
