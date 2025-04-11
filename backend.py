@@ -38,12 +38,13 @@ from pymongo.errors import ConfigurationError, ConnectionFailure, ServerSelectio
 
 LOG = logging.getLogger(__name__)
 
-os.environ["OPENAI_API_KEY"] = "sk-"
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 S3_KEY = os.getenv("S3_KEY")
 S3_SECRET = os.getenv("S3_SECRET")
-S3_BUCKET = "bucket-name"
-S3_REGION = "us-east-1"
-S3_PATH = "path/to/your/files"
+S3_BUCKET = os.getenv("S3_BUCKET")
+S3_REGION = os.getenv("S3_REGION")
+S3_PATH = os.getenv("S3_PATH")
+
 try:
     MONGO_URL = "mongodb+srv://root:root@localhost:27017/"
     client: pymongo.MongoClient = pymongo.MongoClient(MONGO_URL, uuidRepresentation="standard")
