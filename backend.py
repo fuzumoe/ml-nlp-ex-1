@@ -3,10 +3,10 @@ import logging
 
 # Import os and sys for system operations
 import os
-import sys  # noqa: F401
+import sys
 
 # Import traceback for error handling
-import traceback  # noqa: F401
+import traceback
 import urllib.parse  # noqa: F401
 
 import awswrangler as wr  # noqa: F401
@@ -34,7 +34,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter  # noqa: F401
 from langchain_community.vectorstores import FAISS  # noqa: F401
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings  # noqa: F401
 from pydantic import BaseModel  # noqa: F401
-from pymongo.errors import ConfigurationError, ConnectionFailure, ServerSelectionTimeoutError
 
 LOG = logging.getLogger(__name__)
 
@@ -45,12 +44,22 @@ S3_SECRET = os.getenv("S3_SECRET_KEY")
 S3_BUCKET = os.getenv("S3_BUCKET")
 S3_REGION = os.getenv("S3_REGION")
 S3_PATH = os.getenv("S3_PATH")
+MONGO_URL = os.getenv("MONGO_URL")
 
+for var in [OPENAI_API_KEY, S3_URL, S3_KEY, S3_SECRET, S3_BUCKET, S3_REGION, S3_PATH, MONGO_URL]:
+    if var is None:
+        LOG.error(f"Environment variable {var} is not set.")
+        msg = f"Environment variable {var} is not set."
+        raise ValueError(msg)
 try:
-    MONGO_URL = "mongodb+srv://root:root@localhost:27017/"
     client: pymongo.MongoClient = pymongo.MongoClient(MONGO_URL, uuidRepresentation="standard")
-    db = client["test"]
-    LOG.info("MongoDB connection URL set successfully.")
+    db = client["chat_with_doc"]
+    chat_history_collection = db["chat-history"]
 
-except (ConnectionFailure, ConfigurationError, ServerSelectionTimeoutError):
-    LOG.exception("Error setting MongoDB connection URL")
+    chat_history_collection.create_index([("session_id")], unique=True)
+except Exception:
+    LOG.exception(traceback.format_exc())
+    exc_type, exc_value, exc_tb = sys.exc_info()
+    if exc_tb:
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        LOG.exception(f"{exc_type} {exc_value} {fname} {exc_tb.tb_lineno}")
