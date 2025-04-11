@@ -39,8 +39,9 @@ from pymongo.errors import ConfigurationError, ConnectionFailure, ServerSelectio
 LOG = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-S3_KEY = os.getenv("S3_KEY")
-S3_SECRET = os.getenv("S3_SECRET")
+S3_URL = os.getenv("S3_ENDPOINT_URL")
+S3_KEY = os.getenv("S3_ACCESS_KEY")
+S3_SECRET = os.getenv("S3_SECRET_KEY")
 S3_BUCKET = os.getenv("S3_BUCKET")
 S3_REGION = os.getenv("S3_REGION")
 S3_PATH = os.getenv("S3_PATH")
