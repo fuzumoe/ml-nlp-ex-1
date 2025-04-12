@@ -3,7 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.endpoints import routes
 
-chat_app = FastAPI(title="My FastAPI Project")
+chat_app = FastAPI(
+    title="🚀 Awesome Chat API",
+    description=(
+        "An interactive API that allows users to upload documents and engage "
+        "in intelligent, context-aware conversations with their content. "
+        "Powered by OpenAI and document retrieval techniques."
+    ),
+    version="1.0.0",
+)
+
 chat_app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

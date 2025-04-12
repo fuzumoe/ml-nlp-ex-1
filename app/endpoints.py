@@ -20,6 +20,22 @@ routes = APIRouter()
 
 @routes.post("/chat")
 async def create_chat_message(chats: ChatMessageSent) -> JSONResponse:
+    """Create a chat message.
+
+    This function handles the chat message creation process and returns a JSON response.
+
+    Args:
+        chats (ChatMessageSent): The chat message object containing user input and session ID.
+
+    Returns:
+        JSONResponse: A JSON response containing the chat message and session ID.
+
+    Raises:
+        HTTPException: If there is an error during the chat message creation process.
+            - 400: Bad Request if the session ID is invalid.
+            - 500: Internal Server Error for other exceptions.
+
+    """
     try:
         if chats.session_id is None:
             session_id = get_session()

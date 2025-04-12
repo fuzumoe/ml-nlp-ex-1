@@ -182,7 +182,7 @@ def add_session_history(session_id: str, new_values: list) -> bool:
         return True
 
 
-def get_relocated_file(filename: str | None) -> Path:
+def get_temp_file_path(filename: str | None) -> Path:
     """Validate filename and prepare a temporary file path.
 
     Args:
