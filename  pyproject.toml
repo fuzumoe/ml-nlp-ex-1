@@ -1,7 +1,0 @@
-[tool.ruff]
-line-length = 100
-select = ["E", "F", "I", "D"]  # You can remove D if you don’t want docstring rules
-ignore = ["D100", "D101", "D102"]
-
-# Optionally enable autofix on pre-commit
-fix = true
