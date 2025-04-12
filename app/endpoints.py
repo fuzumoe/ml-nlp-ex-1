@@ -5,9 +5,10 @@ from fastapi import APIRouter, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 
 from app.accessors import get_s3_client
+from app.chat import get_response
 from app.config import get_config_variables
 from app.models import ChatMessageSent
-from app.utils import add_session_history, get_response, get_session, get_temp_file_path
+from app.utils import add_session_history, get_session, get_temp_file_path
 
 LOG = logging.getLogger(__name__)
 
