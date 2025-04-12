@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from app.accessors import get_s3_client
 from app.config import get_config_variables
 from app.models import ChatMessageSent
-from app.utils import add_session_history, get_relocated_file, get_response, get_session
+from app.utils import add_session_history, get_response, get_session, get_temp_file_path
 
 LOG = logging.getLogger(__name__)
 
@@ -92,15 +92,19 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
     Returns:
         JSONResponse: A JSON response indicating the result of the upload.
 
+    Raises:
+        HTTPException: If there is an error during the file upload process.
+            - 400: Bad Request if the file already exists.
+            - 500: Internal Server Error for other exceptions.
+
     """
     LOG.info(f"File name: {data_file.filename}")
 
     try:
-        temp_file = get_relocated_file(data_file.filename)
-
-        content = await data_file.read()
+        temp_file = get_temp_file_path(data_file.filename)
 
         async with aiofiles.open(temp_file, "wb") as out_file:
+            content = await data_file.read()
             await out_file.write(content)
 
             object_key = f"{CONFIG.S3_PATH}/{temp_file.name}"
@@ -109,10 +113,6 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
                 CONFIG.S3_BUCKET,  # Bucket name
                 object_key,
             )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"detail": "File uploaded successfully"},
-        )
     except FileNotFoundError as e:
         message = str(e)
         LOG.exception(f"Error saving file: {message}")
@@ -120,3 +120,16 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"File already exists: {message}",
         ) from e
+    except Exception as e:
+        message = str(e)
+        LOG.exception(f"Error uploading file: {message}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal Server Error: {message}",
+        ) from e
+    else:
+        LOG.info(f"File uploaded successfully: {data_file.filename}")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"detail": "File uploaded successfully"},
+        )
