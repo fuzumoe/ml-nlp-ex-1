@@ -2,6 +2,7 @@
 
 import mongomock
 import pytest
+from app.backend import accessors
 from app.backend.config import get_config_variables
 from app.backend.endpoints import routes
 from fastapi import FastAPI
@@ -19,8 +20,6 @@ def load_test_env(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def mock_mongo(monkeypatch):
-    from app.backend import accessors
-
     mock_client = mongomock.MongoClient()
     monkeypatch.setattr(accessors, "get_client", lambda: mock_client)
     monkeypatch.setattr(accessors, "_mongo_client_cache", {"default": mock_client})

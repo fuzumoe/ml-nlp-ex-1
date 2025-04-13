@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 import pymongo
 
@@ -25,13 +24,14 @@ def get_client() -> pymongo.MongoClient:
     return client
 
 
-def get_collection() -> Any:
-    """Get the MongoDB collection. Create it if it does not exist."""
+def get_collection():
+    from app.backend.config import get_config_variables
+
+    config = get_config_variables()
     client = get_client()
-    db = client[_db_name]  # ✅ Explicit DB access
+    db = client[config.MONGO_DB_NAME]
 
     if _collection_name not in db.list_collection_names():
-        LOG.info(f"Collection '{_collection_name}' not found. Creating it.")
         db.create_collection(_collection_name)
 
     return db[_collection_name]
