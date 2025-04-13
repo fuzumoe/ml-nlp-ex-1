@@ -94,7 +94,7 @@ python run_frontend.py
 
 ## 🐳 Docker Support
 
-If you want to run MongoDB via Docker:
+To run MongoDB via Docker:
 
 ```bash
 docker-compose up -d
@@ -107,6 +107,29 @@ docker-compose up -d
 1. Go to the frontend  
 2. Upload a `.pdf` or `.docx`  
 3. Start chatting with the document!  
+
+---
+
+## 💻 For Developers
+
+### ✅ Code Style
+
+This project uses [`ruff`](https://docs.astral.sh/ruff/) for linting and `pre-commit` hooks to enforce formatting.
+
+### 🔧 Set up `pre-commit`
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Now every commit will automatically trigger linting and formatting checks.
+
+To run pre-commit manually on all files:
+
+```bash
+pre-commit run --all-files
+```
 
 ---
 
