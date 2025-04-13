@@ -26,7 +26,6 @@ jobs:
         run: |
           uv venv
           source .venv/bin/activate
-          uv pip install --editable . --extra dev
           uv sync --extra dev
 
       - name: 🧹 Run Ruff Linter
