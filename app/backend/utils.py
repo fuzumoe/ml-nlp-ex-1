@@ -12,8 +12,6 @@ LOG = logging.getLogger(__name__)
 
 CONFIG = get_config_variables()
 
-CHAT_HISTORY_COLLECTION = get_collection()
-
 
 def load_memory_to_pass(session_id: str) -> list:
     """Load the memory history for a given session ID.
@@ -28,7 +26,7 @@ def load_memory_to_pass(session_id: str) -> list:
         list: The loaded memory history.
 
     """
-    data = CHAT_HISTORY_COLLECTION.find_one({"session_id": session_id})
+    data = get_collection().find_one({"session_id": session_id})
     history = []
 
     if data:
@@ -69,17 +67,17 @@ def add_session_history(session_id: str, new_values: list) -> bool:
 
     """
     try:
-        doc = CHAT_HISTORY_COLLECTION.find_one({"session_id": session_id})
+        doc = get_collection().find_one({"session_id": session_id})
 
         if doc:
             conversion = doc["conversion"]
             conversion.extend(new_values)
-            CHAT_HISTORY_COLLECTION.update_one(
+            get_collection().update_one(
                 {"session_id": session_id},
                 {"$set": {"conversion": conversion}},
             )
         else:
-            CHAT_HISTORY_COLLECTION.insert_one(
+            get_collection().insert_one(
                 {
                     "session_id": session_id,
                     "conversion": new_values,

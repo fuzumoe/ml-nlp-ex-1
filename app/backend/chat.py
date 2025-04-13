@@ -10,14 +10,11 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 
-from app.backend.accessors import get_collection
 from app.backend.config import get_config_variables
 from app.backend.utils import get_temp_file_path, load_memory_to_pass
 
 LOG = logging.getLogger(__name__)
 CONFIG = get_config_variables()
-
-CHAT_HISTORY_COLLECTION = get_collection()
 
 
 def get_response(

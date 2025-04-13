@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 def load_test_env(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     monkeypatch.setenv("OPENAI_API_BASE", "http://fake.base")
-    monkeypatch.setenv("MONGO_URL", "mongodb://localhost:27017")
+    monkeypatch.setenv("MONGO_URL", "mongodb://mock:27017")
     monkeypatch.setenv("MONGO_DB_NAME", "test-db")
     return get_config_variables()
 
@@ -22,9 +22,7 @@ def load_test_env(monkeypatch):
 def mock_mongo(monkeypatch):
     mock_client = mongomock.MongoClient()
     monkeypatch.setattr(accessors, "get_client", lambda: mock_client)
-    monkeypatch.setattr(accessors, "_mongo_client_cache", {"default": mock_client})
-    yield
-    mock_client.close()
+    monkeypatch.setitem(accessors.MONGO_CLIENT_CACHE, "default", mock_client)
 
 
 @pytest.fixture
