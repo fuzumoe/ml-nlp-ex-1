@@ -3,7 +3,7 @@ repos:
   hooks:
     - id: ruff-fix
       name: Linting with Automatic Fixes
-      entry: ci/ruff.sh
+      entry: .github/workflows/ruff.sh
       args:
         - check
         - --fix
@@ -11,7 +11,7 @@ repos:
       pass_filenames: false
     - id: ruff-format
       name: Formatting
-      entry: ci/ruff.sh
+      entry: .github/workflows/ruff.sh
       args:
         - format
       language: system
