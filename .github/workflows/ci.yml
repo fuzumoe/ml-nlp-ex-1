@@ -41,4 +41,4 @@ jobs:
           bash .github/workflows/ruff.sh . CI
 
       - name: 🧪 Run tests
-        run: pytest tests/ --tb=short -v
+        run: pytest tests --tb=short -v
