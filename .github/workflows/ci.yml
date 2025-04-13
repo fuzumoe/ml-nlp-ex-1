@@ -1,8 +1,9 @@
-name: CI
+name: 🚀 CI Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - "**"
   pull_request:
 
 jobs:
@@ -10,35 +11,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install uv
+      - name: 🛠️ Install uv
         run: curl -Ls https://astral.sh/uv/install.sh | sh
 
-      - name: Sync project dependencies (incl. dev)
+      - name: 📦 Sync project dependencies (incl. dev)
         run: |
           uv venv
           source .venv/bin/activate
-          uv pip install --extra dev
+          uv pip install --editable . --extra dev
           uv sync --extra dev
 
-      - name: Run Ruff linter
+      - name: 🧹 Run Ruff Linter
         run: |
-          source .venv/bin/activate
-          ruff check .
+          chmod +x .github/workflows/ruff.sh
+          bash .github/workflows/ruff.sh . CI
 
-      - name: Run Mypy
+      - name: 🔍 Run Mypy Type Checks
         run: |
           source .venv/bin/activate
           mypy .
 
-      - name: Run tests
+      - name: 🧪 Run Tests
         run: |
           source .venv/bin/activate
           pytest tests/ --tb=short -v
