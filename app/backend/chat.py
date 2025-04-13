@@ -28,7 +28,19 @@ def get_response(
     model: str = "mistralai/Mistral-7B-Instruct-v0.1",
     temperature: float = 0.0,
 ) -> Any:
-    """Get the response from the model."""
+    """Get a response from the model using the provided file and query.
+
+    Args:
+        file_name (str): The name of the file to process.
+        session_id (str): The session ID for chat history.
+        query (str): The user's query.
+        model (str): The model to use for generating responses.
+        temperature (float): The temperature setting for the model.
+
+    Returns:
+        Any: The response from the model.
+
+    """
     LOG.info(f"file name is {file_name}")
 
     # Prepare file path
