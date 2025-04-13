@@ -5,8 +5,8 @@ from pathlib import Path
 
 from pymongo import errors as pymongo_errors
 
-from app.accessors import get_collection
-from app.config import get_config_variables
+from app.backend.accessors import get_collection
+from app.backend.config import get_config_variables
 
 LOG = logging.getLogger(__name__)
 

@@ -3,19 +3,16 @@ import logging
 from typing import Any
 
 import awswrangler as wr
-from langchain.callbacks import get_openai_callback
 from langchain.chains import ConversationalRetrievalChain
-from langchain.document_loaders import (
-    Docx2txtLoader,
-    PyPDFLoader,
-)
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.callbacks.manager import get_openai_callback
+from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-from app.accessors import get_collection, get_s3_session
-from app.config import get_config_variables
-from app.utils import load_memory_to_pass
+from app.backend.accessors import get_collection, get_s3_client
+from app.backend.config import get_config_variables
+from app.backend.utils import get_temp_file_path, load_memory_to_pass
 
 LOG = logging.getLogger(__name__)
 
@@ -24,11 +21,14 @@ CONFIG = get_config_variables()
 CHAT_HISTORY_COLLECTION = get_collection()
 
 
+S3_CLIENT = get_s3_client()
+
+
 def get_response(
     file_name: str,
     session_id: str,
     query: str,
-    model: str = "gpt-4",
+    model: str = "gpt-4-turbo",
     temperature: float = 0.0,
 ) -> Any:
     """Get the response from the model.
@@ -52,22 +52,24 @@ def get_response(
     file_name = file_name.split("/")[-1]
 
     embeddings = OpenAIEmbeddings()
+    temp_file = get_temp_file_path(file_name)
+    local_file = str(temp_file.absolute())
+    object_key = f"{CONFIG.S3_PATH}/{file_name}"
 
-    wr.s3.download(
-        path=f"s3://{CONFIG.S3_BUCKET}/{CONFIG.S3_PATH}/{file_name}",
-        local_file=file_name,
-        boto3_session=get_s3_session(),
-    )
+    S3_CLIENT.download_file(CONFIG.S3_BUCKET, object_key, local_file)  # Bucket name
 
     loader: PyPDFLoader | Docx2txtLoader | None = None
 
-    if file_name.endswith(".docx"):
-        loader = Docx2txtLoader(file_path=file_name.split("/")[-1])
-    else:
-        loader = PyPDFLoader(file_name)
+    loader = (
+        Docx2txtLoader(file_path=local_file)
+        if file_name.endswith(".docx")
+        else PyPDFLoader(file_name)
+    )
 
     data = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0, separators=["\n", " ", ""])
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000, chunk_overlap=0, separators=["\n", " ", ""]
+    )
 
     all_splits = text_splitter.split_documents(data)
     vectorstore = FAISS.from_documents(all_splits, embeddings)

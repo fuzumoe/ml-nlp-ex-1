@@ -10,6 +10,7 @@ class Config:
     def __init__(self):
         load_dotenv()
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+        os.environ["OPENAI_API_KEY"] = self.OPENAI_API_KEY
         self.S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL")
         self.S3_URL = os.getenv("S3_ENDPOINT_URL")
         self.S3_KEY = os.getenv("S3_ACCESS_KEY")

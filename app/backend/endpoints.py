@@ -4,11 +4,11 @@ import aiofiles
 from fastapi import APIRouter, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 
-from app.accessors import get_s3_client
-from app.chat import get_response
-from app.config import get_config_variables
-from app.models import ChatMessageSent
-from app.utils import add_session_history, get_session, get_temp_file_path
+from app.backend.accessors import get_s3_client
+from app.backend.chat import get_response
+from app.backend.config import get_config_variables
+from app.backend.models import ChatMessageSent
+from app.backend.utils import add_session_history, get_session, get_temp_file_path
 
 LOG = logging.getLogger(__name__)
 
@@ -20,34 +20,38 @@ routes = APIRouter()
 
 
 @routes.post("/chat")
-async def create_chat_message(chats: ChatMessageSent) -> JSONResponse:
-    """Create a chat message.
+async def create_chat_message(
+    chats: ChatMessageSent,
+) -> JSONResponse:
+    """Create a chat message and obtain a response based on user input and session.
 
-    This function handles the chat message creation process and returns a JSON response.
+    This route allows users to send chat messages, and it returns responses based on
+    the provided input and the associated session. If a session ID is not provided
+    in the request, a new session is created. The conversation history is updated, and
+    the response, along with the session ID, is returned.
 
     Args:
-        chats (ChatMessageSent): The chat message object containing user input and session ID.
+        chats (ChatMessageSent): A Pydantic model representing the chat message, including
+        session ID, user input, and data source.
 
     Returns:
-        JSONResponse: A JSON response containing the chat message and session ID.
+        JSONResponse: A JSON response containing the response message and the session ID.
 
     Raises:
-        HTTPException: If there is an error during the chat message creation process.
-            - 400: Bad Request if the session ID is invalid.
-            - 500: Internal Server Error for other exceptions.
+        HTTPException: If an unexpected error occurs during the chat message processing,
+        it returns a 204 NO CONTENT HTTP status with an "error" detail.
 
     """
     try:
         if chats.session_id is None:
             session_id = get_session()
 
-            chat_object = ChatMessageSent(
+            payload = ChatMessageSent(
                 session_id=session_id,
                 user_input=chats.user_input,
                 data_source=chats.data_source,
             )
-
-            payload = chat_object.model_dump()
+            payload = payload.model_dump()
 
             response = get_response(
                 file_name=payload.get("data_source"),
@@ -59,33 +63,39 @@ async def create_chat_message(chats: ChatMessageSent) -> JSONResponse:
                 session_id=session_id,
                 new_values=[payload.get("user_input"), response["answer"]],
             )
+
             return JSONResponse(
                 content={
                     "response": response,
                     "session_id": str(session_id),
                 }
             )
-        chat_object = ChatMessageSent(
+
+        payload = ChatMessageSent(
             session_id=str(chats.session_id),
             user_input=chats.user_input,
             data_source=chats.data_source,
         )
-
-        payload = chat_object.model_dump()  # Fixed the method call to dict()
+        payload_dict: dict[str, str] = payload.model_dump()
 
         response = get_response(
-            file_name=str(payload.get("data_source")),
-            session_id=str(payload.get("session_id")),
-            query=str(payload.get("user_input")),
+            file_name=payload_dict.get("data_source") or "",
+            session_id=payload_dict.get("session_id") or "",
+            query=payload_dict.get("user_input") or "",
         )
+
         add_session_history(
-            session_id=str(payload.get("session_id")),
-            new_values=[payload.get("user_input"), response["answer"]],
+            session_id=payload_dict.get("session_id") or "",
+            new_values=[
+                payload_dict.get("user_input") or "",
+                response.get("answer", ""),
+            ],
         )
+
         return JSONResponse(
             content={
                 "response": response,
-                "session_id": str(payload.get("session_id")),
+                "session_id": str(chats.session_id),
             }
         )
     except Exception as e:
@@ -130,6 +140,11 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
                 CONFIG.S3_BUCKET,  # Bucket name
                 object_key,
             )
+
+        LOG.info(f"File uploaded successfully: {data_file.filename}")
+        response = {"filename": temp_file.name, "file_path": object_key}
+        return JSONResponse(content=response)
+
     except FileNotFoundError as e:
         message = str(e)
         LOG.exception(f"Error saving file: {message}")
@@ -144,9 +159,3 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal Server Error: {message}",
         ) from e
-    else:
-        LOG.info(f"File uploaded successfully: {data_file.filename}")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"detail": "File uploaded successfully"},
-        )

@@ -5,7 +5,7 @@ import boto3
 import pymongo
 from botocore.client import Config
 
-from app.config import get_config_variables
+from app.backend.config import get_config_variables
 
 LOG = logging.getLogger(__name__)
 
@@ -31,7 +31,9 @@ def get_client() -> pymongo.MongoClient:
     if cache_key in _mongo_client_cache:
         return _mongo_client_cache[cache_key]
 
-    client: pymongo.MongoClient = pymongo.MongoClient(CONFIG.MONGO_URL, uuidRepresentation="standard")
+    client: pymongo.MongoClient = pymongo.MongoClient(
+        CONFIG.MONGO_URL, uuidRepresentation="standard"
+    )
     _mongo_client_cache[cache_key] = client
     return client
 
@@ -68,23 +70,3 @@ def get_s3_client() -> Any:
     )
     _s3_client_cache[cache_key] = s3_client
     return s3_client
-
-
-def get_s3_session() -> boto3.Session:
-    """Get an S3 session as a singleton.
-
-    Returns:
-        boto3.Session: The S3 session.
-
-    """
-    cache_key = "session"
-    if cache_key in _s3_client_cache:
-        return _s3_client_cache[cache_key]
-
-    s3_session = boto3.Session(
-        aws_access_key_id=CONFIG.S3_KEY,
-        aws_secret_access_key=CONFIG.S3_SECRET,
-        region_name=CONFIG.S3_REGION,
-    )
-    _s3_client_cache[cache_key] = s3_session
-    return s3_session

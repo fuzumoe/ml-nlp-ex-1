@@ -2,10 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run run.py",
+            "name": "Python: Backend",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/run.py",
+            "program": "${workspaceFolder}/run_backend.py",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "pythonPath": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+
+            "name": "Python: Frontend",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_frontend.py",
             "console": "integratedTerminal",
             "envFile": "${workspaceFolder}/.env",
             "pythonPath": "${workspaceFolder}/.venv/bin/python"
