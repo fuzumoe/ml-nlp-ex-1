@@ -109,23 +109,21 @@ async def create_chat_message(
 
 @routes.post("/uploadFile")
 async def upload_file(data_file: UploadFile) -> JSONResponse:
-    """Upload a file to S3.
+    """Upload a file locally.
 
-    This function handles the file upload process and saves the file to S3.
+    This function saves the uploaded file to a local temp directory and returns its path.
 
     Args:
         data_file (UploadFile): The file to be uploaded.
 
     Returns:
-        JSONResponse: A JSON response indicating the result of the upload.
+        JSONResponse: A JSON response with file metadata.
 
     Raises:
-        HTTPException: If there is an error during the file upload process.
-            - 400: Bad Request if the file already exists.
-            - 500: Internal Server Error for other exceptions.
+        HTTPException: If file saving fails.
 
     """
-    LOG.info(f"File name: {data_file.filename}")
+    LOG.info(f"Received file: {data_file.filename}")
 
     try:
         temp_file = get_temp_file_path(data_file.filename)
@@ -134,27 +132,13 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
             content = await data_file.read()
             await out_file.write(content)
 
-            object_key = f"{CONFIG.S3_PATH}/{temp_file.name}"
-            S3_CLIENT.upload_file(
-                str(temp_file.absolute()),
-                CONFIG.S3_BUCKET,  # Bucket name
-                object_key,
-            )
-
-        LOG.info(f"File uploaded successfully: {data_file.filename}")
-        response = {"filename": temp_file.name, "file_path": object_key}
+        LOG.info(f"File saved locally: {temp_file.name}")
+        response = {"filename": temp_file.name, "file_path": str(temp_file.absolute())}
         return JSONResponse(content=response)
 
-    except FileNotFoundError as e:
-        message = str(e)
-        LOG.exception(f"Error saving file: {message}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File already exists: {message}",
-        ) from e
     except Exception as e:
         message = str(e)
-        LOG.exception(f"Error uploading file: {message}")
+        LOG.exception(f"Error saving file locally: {message}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal Server Error: {message}",
