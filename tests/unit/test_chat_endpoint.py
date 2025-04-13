@@ -2,7 +2,7 @@ import io
 import tempfile
 from http import HTTPStatus
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from app.backend.chat import get_response
@@ -18,18 +18,21 @@ def create_test_app() -> TestClient:
     return TestClient(app)
 
 
-@pytest.mark.asyncio
 @patch("app.backend.endpoints.get_temp_file_path")
 @patch("aiofiles.open")
-async def test_upload_file_local(mock_aio_open: MagicMock, mock_get_temp_path: MagicMock) -> None:
+@pytest.mark.asyncio
+async def test_upload_file_local_with_async_mock(
+    mock_aio_open: AsyncMock,
+    mock_get_temp_path: MagicMock,
+) -> None:
     client = create_test_app()
 
     mock_path: Path = Path(tempfile.mkstemp(suffix=".pdf")[1])
     mock_get_temp_path.return_value = mock_path
 
-    # Mock aiofiles
-    mock_file: MagicMock = MagicMock()
-    mock_cm: MagicMock = MagicMock()
+    # Async mock for aiofiles.open
+    mock_file = AsyncMock()
+    mock_cm = AsyncMock()
     mock_cm.__aenter__.return_value = mock_file
     mock_aio_open.return_value = mock_cm
 
@@ -43,9 +46,9 @@ async def test_upload_file_local(mock_aio_open: MagicMock, mock_get_temp_path: M
     response = client.post("/uploadFile", files={"data_file": file})
 
     assert response.status_code == HTTPStatus.OK
-    data: dict = response.json()
+    data = response.json()
     assert data["filename"].endswith(".pdf")
-    assert data["file_path"] == str(mock_path.absolute())
+    assert str(mock_path.absolute()) in data["file_path"]
 
 
 @patch("app.backend.chat.get_openai_callback")

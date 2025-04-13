@@ -126,16 +126,20 @@ async def upload_file(data_file: UploadFile) -> JSONResponse:
     try:
         temp_file = get_temp_file_path(data_file.filename)
 
+        # Save uploaded file to the temporary file path
         async with aiofiles.open(temp_file, "wb") as out_file:
-            content = await data_file.read()
+            content: bytes = await data_file.read()
             await out_file.write(content)
 
         LOG.info(f"File saved locally: {temp_file.name}")
-        response = {"filename": temp_file.name, "file_path": str(temp_file.absolute())}
+        response: dict[str, str] = {
+            "filename": temp_file.name,
+            "file_path": str(temp_file.absolute()),
+        }
         return JSONResponse(content=response)
 
     except Exception as e:
-        message = str(e)
+        message: str = str(e)
         LOG.exception(f"Error saving file locally: {message}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

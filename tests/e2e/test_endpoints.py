@@ -1,19 +1,21 @@
-# tests/unit/test_chat_endpoint.py
-
 from http import HTTPStatus
 
-from app.backend import chat
+import pytest
 from app.backend.endpoints import routes
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 
-def test_post_chat(monkeypatch):
+def create_test_app() -> TestClient:
     app = FastAPI()
     app.include_router(routes)
-    client = TestClient(app)
+    return TestClient(app)
 
-    # Mock get_response
+
+@pytest.mark.usefixtures("mock_mongo")
+def test_post_chat(monkeypatch):
+    client = create_test_app()
+
     def mock_get_response(
         file_name: str,  # noqa: ARG001
         session_id: str,  # noqa: ARG001
@@ -23,7 +25,7 @@ def test_post_chat(monkeypatch):
     ) -> dict[str, str | int]:
         return {"answer": "Mocked response", "total_tokens_used": 42}
 
-    monkeypatch.setattr(chat, "get_response", mock_get_response)
+    monkeypatch.setattr("app.backend.endpoints.get_response", mock_get_response)
 
     payload = {
         "session_id": "test-session",
