@@ -25,6 +25,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: ✅ Set test env vars
+        run: |
+          echo "OPENAI_API_KEY=test-key" >> $GITHUB_ENV
+          echo "OPENAI_API_BASE=http://fake.base" >> $GITHUB_ENV
+          echo "MONGO_URL=mongodb://localhost:27017" >> $GITHUB_ENV
+          echo "MONGO_DB_NAME=test-db" >> $GITHUB_ENV
+          echo "S3_BUCKET=test-bucket" >> $GITHUB_ENV
+          echo "S3_PATH=uploads" >> $GITHUB_ENV
+
       - name: 🧹 Run ruff
         run: |
           chmod +x .github/workflows/ruff.sh
