@@ -11,26 +11,12 @@ class Config:
         load_dotenv()
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         self.OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
-        os.environ["OPENAI_API_KEY"] = self.OPENAI_API_KEY
-        os.environ["OPENAI_API_BASE"] = self.OPENAI_API_BASE
         self.S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL")
-        self.S3_URL = os.getenv("S3_ENDPOINT_URL")
-        self.S3_KEY = os.getenv("S3_ACCESS_KEY")
-        self.S3_SECRET = os.getenv("S3_SECRET_KEY")
-        self.S3_BUCKET = os.getenv("S3_BUCKET")
-        self.S3_REGION = os.getenv("S3_REGION")
-        self.S3_PATH = os.getenv("S3_PATH")
         self.MONGO_URL = os.getenv("MONGO_URL")
         self.MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
 
         for var in [
             self.OPENAI_API_KEY,
-            self.S3_ENDPOINT_URL,
-            self.S3_KEY,
-            self.S3_SECRET,
-            self.S3_BUCKET,
-            self.S3_REGION,
-            self.S3_PATH,
             self.MONGO_URL,
             self.OPENAI_API_BASE,
             self.OPENAI_API_BASE,
@@ -41,15 +27,8 @@ class Config:
                 msg = f"Environment variable {var} is not set."
                 raise ValueError(msg)
 
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL")
-    S3_URL = os.getenv("S3_ENDPOINT_URL")
-    S3_KEY = os.getenv("S3_ACCESS_KEY")
-    S3_SECRET = os.getenv("S3_SECRET_KEY")
-    S3_BUCKET = os.getenv("S3_BUCKET")
-    S3_REGION = os.getenv("S3_REGION")
-    S3_PATH = os.getenv("S3_PATH")
-    MONGO_URL = os.getenv("MONGO_URL")
+        os.environ["OPENAI_API_KEY"] = self.OPENAI_API_KEY
+        os.environ["OPENAI_API_BASE"] = self.OPENAI_API_BASE
 
 
 def get_config_variables() -> Config:

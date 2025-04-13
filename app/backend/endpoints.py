@@ -4,7 +4,6 @@ import aiofiles
 from fastapi import APIRouter, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 
-from app.backend.accessors import get_s3_client
 from app.backend.chat import get_response
 from app.backend.config import get_config_variables
 from app.backend.models import ChatMessageSent
@@ -13,7 +12,6 @@ from app.backend.utils import add_session_history, get_session, get_temp_file_pa
 LOG = logging.getLogger(__name__)
 
 CONFIG = get_config_variables()
-S3_CLIENT = get_s3_client()
 
 
 routes = APIRouter()
@@ -51,17 +49,17 @@ async def create_chat_message(
                 user_input=chats.user_input,
                 data_source=chats.data_source,
             )
-            payload = payload.model_dump()
+            payload_dict: dict[str, str] = payload.model_dump()
 
             response = get_response(
-                file_name=payload.get("data_source"),
-                session_id=payload.get("session_id"),
-                query=payload.get("user_input"),
+                file_name=payload_dict.get("data_source") or "",
+                session_id=payload_dict.get("session_id") or "",
+                query=payload_dict.get("user_input") or "",
             )
 
             add_session_history(
                 session_id=session_id,
-                new_values=[payload.get("user_input"), response["answer"]],
+                new_values=[payload_dict.get("user_input"), response["answer"]],
             )
 
             return JSONResponse(
@@ -76,7 +74,7 @@ async def create_chat_message(
             user_input=chats.user_input,
             data_source=chats.data_source,
         )
-        payload_dict: dict[str, str] = payload.model_dump()
+        payload_dict = payload.model_dump()
 
         response = get_response(
             file_name=payload_dict.get("data_source") or "",
