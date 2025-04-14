@@ -10,6 +10,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      OPENAI_API_KEY: dummy-key
+      OPENAI_API_BASE: http://fake-base
+      MONGO_URL: mongodb://localhost:27017
+      MONGO_DB_NAME: test-db
+
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
@@ -36,7 +42,7 @@ jobs:
       - name: 🔍 Run Mypy Type Checks
         run: |
           source .venv/bin/activate
-          mypy app/
+          mypy app/ --cache-dir=.mypy_cache
 
       - name: 🧪 Run Tests
         run: |
