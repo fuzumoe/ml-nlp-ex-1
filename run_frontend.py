@@ -10,7 +10,18 @@ LOG = logging.getLogger(__name__)
 
 
 def main() -> None:
-    """Run the Streamlit application."""
+    """Run the Streamlit app.
+
+    This function sets up the environment and runs the Streamlit app
+    located in the 'app/frontend' directory.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    """
     # Get the base directory of the project
     base_dir = Path(__file__).parent.absolute()
 
