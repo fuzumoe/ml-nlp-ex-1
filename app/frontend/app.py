@@ -124,8 +124,8 @@ def upload_file(file_path: str) -> str | None:
     if response.status_code == HTTPStatus.OK:
         # LOG.info the API response for debugging
         LOG.info(f"response: {response.json()}")
-        # Return the file path returned by the API
-        return response.json()["file_path"]
+        # Return the file path returned by the API, explicitly cast to string
+        return str(response.json()["file_path"])
 
     LOG.error(f"File upload failed with status code: {response.status_code}")
     return None

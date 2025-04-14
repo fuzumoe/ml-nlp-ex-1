@@ -59,7 +59,10 @@ async def create_chat_message(
 
             add_session_history(
                 session_id=session_id,
-                new_values=[payload_dict.get("user_input"), response["answer"]],
+                new_values=[
+                    payload_dict.get("user_input", "") or "",
+                    response["answer"],
+                ],
             )
 
             return JSONResponse(

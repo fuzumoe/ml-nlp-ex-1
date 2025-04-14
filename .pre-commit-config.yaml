@@ -16,3 +16,13 @@ repos:
         - format
       language: system
       pass_filenames: false 
+    
+    - id: mypy
+      name: 🔍 Mypy – Static Typing Check
+      entry: bash
+      args:
+        - -c
+        - |
+          source .venv/bin/activate && mypy app
+      language: system
+      pass_filenames: false

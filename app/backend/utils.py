@@ -13,7 +13,7 @@ LOG = logging.getLogger(__name__)
 CONFIG = get_config_variables()
 
 
-def load_memory_to_pass(session_id: str) -> list:
+def load_memory_to_pass(session_id: str) -> list[tuple[str, str]]:
     """Load the memory history for a given session ID.
 
     This function retrieves the conversation history from the MongoDB
@@ -52,7 +52,7 @@ def get_session() -> str:
     return str(uuid.uuid4())
 
 
-def add_session_history(session_id: str, new_values: list) -> bool:
+def add_session_history(session_id: str, new_values: list[str]) -> bool:
     """Add a new session history entry.
 
     This function adds a new entry to the chat history in the MongoDB

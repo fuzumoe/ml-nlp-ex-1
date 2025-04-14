@@ -43,6 +43,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "types-requests",
     "ruff",
     "mypy",
     "types-requests",
@@ -51,7 +52,7 @@ dev = [
     "types-awscrt"
 ]
 
- 
+
 [tool.ruff]
 line-length = 100
 exclude = ["data", ".venv"]

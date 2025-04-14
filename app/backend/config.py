@@ -7,7 +7,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Config:
-    def __init__(self):
+    def __init__(self) -> "None":
         load_dotenv()
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         self.OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
@@ -27,8 +27,8 @@ class Config:
                 msg = f"Environment variable {var} is not set."
                 raise ValueError(msg)
 
-        os.environ["OPENAI_API_KEY"] = self.OPENAI_API_KEY
-        os.environ["OPENAI_API_BASE"] = self.OPENAI_API_BASE
+        os.environ["OPENAI_API_KEY"] = self.OPENAI_API_KEY or ""
+        os.environ["OPENAI_API_BASE"] = self.OPENAI_API_BASE or ""
 
 
 def get_config_variables() -> Config:
