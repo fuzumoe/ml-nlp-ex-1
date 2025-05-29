@@ -154,5 +154,4 @@ Built with ❤️ using:
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [LangChain](https://www.langchain.com/)
 - [Streamlit](https://streamlit.io/)
-- [Together.ai](https://together.ai/)
 - [Emojis](https://emojipedia.org/) from [Emojipedia](https://emojipedia.org/)
